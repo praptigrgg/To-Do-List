@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+@extends('admin-dashboard.layouts')
+@section('content')
+
     <title>User Dashboard</title>
     <style>
         body {
@@ -110,52 +109,51 @@
             color: #999;
         }
     </style>
-</head>
-<body>
+
 
 <div class="container">
-    <h1>User Dashboard</h1>
+    <h1>All Users</h1>
 
-    {{-- Stats --}}
-    <div class="stats">
-        <div class="card">
-            <h5>Total Users</h5>
-            <h2>{{ $totalUsers }}</h2>
-        </div>
+    <a href="{{ route('admin.users.create') }}" class="btn btn-primary mb-3">Create New User</a>
 
-    </div>
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
-
-
-    {{-- Recent Signups --}}
-    <div class="section">
-        <h3>Recent Signups</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Registered At</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($recentUsers as $user)
-                <tr>
-                    <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>{{$user->role}}</td>
-                    <td>{{ $user->created_at->format('Y-m-d H:i') }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="3" class="text-muted text-center">No recent signups found.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+    <table class="table table-bordered bg-white">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Registered</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($users as $user)
+            <tr>
+                <td>{{ $user->name }}</td>
+                <td>{{ $user->email }}</td>
+                <td>{{ $user->role->name ?? 'N/A' }}</td>
+                <td>{{ $user->created_at->format('Y-m-d') }}</td>
+                <td>
+                    <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-warning">Edit</a>
+                    <form action="{{ route('admin.users.delete', $user) }}" method="POST" style="display:inline-block;">
+                        @csrf
+                        @method('DELETE')
+                        <button onclick="return confirm('Are you sure?')" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="5">No users found.</td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
 </div>
 
-</body>
-</html>
+
+@endsection

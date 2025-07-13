@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-                    $table->string('user_name');
+            $table->string('user_name');
 
             $table->string('description');
-        $table->boolean('completed')->default(false);
+            $table->boolean('completed')->default(false);
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->timestamps();
         });
@@ -31,9 +32,8 @@ return new class extends Migration
     {
         Schema::dropIfExists('tasks');
         Schema::table('tasks', function (Blueprint $table) {
-        $table->dropColumn('completed');
-                $table->dropColumn('user_name');
-
-    });
+            $table->dropColumn('completed');
+            $table->dropColumn('user_name');
+        });
     }
 };

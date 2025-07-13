@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
-     public function showRegisterForm()
+    public function showRegisterForm()
     {
         return view('auth.register');
     }
@@ -24,13 +25,14 @@ class AuthController extends Controller
         ]);
 
         $otp = rand(100000, 999999);
+        $role = Role::firstOrCreate(['name' => 'user']);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'otp' => $otp,
-            'role' => 'user',
+            'role_id' => $role->id,
         ]);
 
         Mail::raw("Your OTP is: $otp", function ($message) use ($user) {
@@ -76,7 +78,7 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+$user = User::where('email', $request->email)->with('role')->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return back()->withErrors(['email' => 'Invalid credentials']);
@@ -84,8 +86,9 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        if($user->role=='admin'){
-            return redirect()->route('amdin.dashboard.users');
+        if ($user->role && $user->role->name === 'admin') {
+            return redirect()->route('admin.dashboard.users');
+
         }
 
         return redirect()->route('home');
@@ -123,7 +126,6 @@ class AuthController extends Controller
         session(['forgot_user_id' => $user->id]);
         return redirect()->route('password.reset.form');
     }
-
     public function showResetForm()
     {
         return view('auth.passwords.reset');

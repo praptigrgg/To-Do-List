@@ -21,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+     'role_id',
         'otp',
         'otp_used',
         'otp_type',
@@ -54,5 +54,10 @@ class User extends Authenticatable
 {
     return $this->hasMany(Task::class);
 }
+ public function role()
+{
+    return $this->belongsTo(Role::class);
+}
+
 
 }

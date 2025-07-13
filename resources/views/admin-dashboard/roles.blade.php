@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+@extends('admin-dashboard.layouts')
+@section('content')
+
     <title>Manage User Roles</title>
     <style>
         body {
@@ -18,7 +17,7 @@
             background: #fff;
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         h1 {
@@ -41,7 +40,8 @@
             margin-top: 10px;
         }
 
-        th, td {
+        th,
+        td {
             padding: 12px 16px;
             border-bottom: 1px solid #eee;
             text-align: left;
@@ -74,67 +74,83 @@
         }
 
         @media (max-width: 768px) {
-            td, th {
+
+            td,
+            th {
                 font-size: 14px;
                 padding: 10px;
             }
 
-            select, .btn {
+            select,
+            .btn {
                 font-size: 13px;
             }
         }
     </style>
-</head>
-<body>
-@if (session('status'))
-    <div class="alert alert-success">
-        {{ session('status') }}
-    </div>
-@endif
-<div class="container">
-    <h1>Manage User Roles</h1>
 
-    @if (session('success'))
-        <div class="alert">
-            {{ session('success') }}
+    @if (session('status'))
+        <div class="alert alert-success">
+            {{ session('status') }}
         </div>
     @endif
+    <div class="container">
+        <h1>Manage User Roles</h1>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Current Role</th>
-                <th>Change Role</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($users as $user)
+        @if (session('success'))
+            <div class="alert">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <table>
+            <thead>
                 <tr>
-                    <form method="POST" action="{{ route('admin.dashboard.roles.update', $user->id) }}">
-                        @csrf
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Current Role</th>
+                    <th>Change Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($users as $user)
+                    <tr>
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->email }}</td>
-                        <td>{{ $user->role }}</td>
+                        <td>{{ is_object($user->role) ? $user->role->name : 'N/A' }}</td>
                         <td>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <select name="role">
-                                    @foreach ($roles as $role)
-                                        <option value="{{ $role }}" {{ $user->role === $role ? 'selected' : '' }}>
-                                            {{ ucfirst($role) }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <button type="submit" class="btn">Update</button>
-                            </div>
+                            <form method="POST" action="{{ route('admin.dashboard.roles.update', $user->id) }}">
+                                @csrf
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <select name="role_id">
+                                        @foreach ($roles as $role)
+                                            <option value="{{ $role->id }}"
+                                                {{ $user->role_id === $role->id ? 'selected' : '' }}>
+                                                {{ ucfirst($role->name) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <button type="submit" class="btn">Update</button>
+                                </div>
+                            </form>
                         </td>
-                    </form>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
+                        <td>
 
-</body>
-</html>
+                            <form action="{{ route('admin.roles.delete', $role) }}" method="POST"
+                                style="display:inline-block;">
+                                @csrf
+                                @method('DELETE')
+                                <button onclick="return confirm('Are you sure?')"
+                                    class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+
+
+@endsection

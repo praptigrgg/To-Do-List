@@ -17,12 +17,14 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('role')->default('user');
 
             $table->string('otp')->nullable();
             $table->boolean('otp_used')->default(false);
             $table->string('otp_type')->nullable();
             $table->timestamp('otp_expires_at')->nullable();
+
+                        $table->foreignId('role_id')->constrained()->onDelete('cascade');
+
             $table->rememberToken();
             $table->timestamps();
         });

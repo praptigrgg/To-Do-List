@@ -39,6 +39,8 @@
                                <input type="checkbox" name="completed" onchange="this.form.submit()"
                                 {{ $task->completed ? 'checked' : '' }}> (Tick the box if the task is completed.)
                         </form>
+                        <a href="{{ route('tasks.edit', $task->id) }}" class="btn btn-secondary btn-sm" style="margin-left: 10px;">Edit</a>
+
                         <form action="{{ route('tasks.destroy', $task->id) }}" method="POST"
                             style="display: inline-block; margin-left: 10px;">
                             @csrf
